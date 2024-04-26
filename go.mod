@@ -3,6 +3,8 @@ module raglib
 go 1.14
 
 require (
+	github.com/go-chi/chi/v5 v5.0.12 // indirect
+	github.com/go-chi/render v1.0.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/qdrant/go-client v1.8.0
 	github.com/sashabaranov/go-openai v1.20.3
