@@ -2,8 +2,10 @@ package generation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
+	"io"
 	"raglib/internal/document"
 	"strings"
 )
@@ -33,9 +35,10 @@ type Answerer struct {
 	openaiClient *openai.Client
 }
 
-// Generate generates an answer to some text based off the given docs
+// Generate implements the Generator interface. It generates an answer to some text grounded in the given documents.
 // TODO Generators as a concept are feeling a light silly/like they haven't hit their mark ye
-func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []document.Document) (string, error) {
+func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []document.Document, responseChan chan<- string, shouldStream bool) error {
+	defer close(responseChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
 		combinedPassages[i] = documentToPassagesString(d)
@@ -49,14 +52,37 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleUser, Content: prompt},
 		},
+		Stream: shouldStream,
 	}
 
-	resp, err := tg.openaiClient.CreateChatCompletion(ctx, req)
+	if !shouldStream {
+		resp, err := tg.openaiClient.CreateChatCompletion(ctx, req)
+		if err != nil {
+			return fmt.Errorf("error making OpenAI API request: %v", err)
+		}
+		responseChan <- resp.Choices[0].Message.Content
+		return nil
+	}
+
+	stream, err := tg.openaiClient.CreateChatCompletionStream(ctx, req)
 	if err != nil {
-		return "", fmt.Errorf("error making OpenAI API request: %v", err)
+		return fmt.Errorf("error making OpenAI API request: %v", err)
 	}
+	defer stream.Close()
 
-	return resp.Choices[0].Message.Content, nil
+	for {
+		response, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			fmt.Println("\nStream finished")
+			return nil
+		}
+
+		if err != nil {
+			return fmt.Errorf("error while streaming response: %v", err)
+		}
+
+		responseChan <- response.Choices[0].Delta.Content
+	}
 }
 
 func NewAnswerer(openAIClient *openai.Client) Answerer {
