@@ -26,6 +26,10 @@ func (sr SERPRetriever) Query(ctx context.Context, query string, maxTopK uint64)
 				//   handle different search results types
 				{Text: r.Snippet},
 			},
+			Reference: document.Reference{
+				Source: document.Web,
+				URL:    r.Link,
+			},
 		}
 	}
 
