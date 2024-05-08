@@ -30,6 +30,7 @@ func (sr SERPRetriever) Query(ctx context.Context, query string, maxTopK uint64)
 				Source: document.Web,
 				URL:    r.Link,
 			},
+			Title: r.Title,
 		}
 	}
 

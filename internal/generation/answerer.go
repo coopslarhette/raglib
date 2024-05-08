@@ -11,11 +11,13 @@ import (
 )
 
 var (
-	promptTemplate = `Given the following document passages
+	promptTemplate = `Given the following document passages, which should each have a reference number,
 
 <passages>%v</passages>
 
 Use them to answer the text below. Your answer could take many forms depending on the text below. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document), or it could be giving a detailed answer at a graduate level of explanation.
+
+A very important part of a good answer is that it is cited. For each statement, or component of your answer, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited>.".
 
 <text_to_answer>%v</text_to_answer>
 `
@@ -41,7 +43,7 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	defer close(responseChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
-		combinedPassages[i] = documentToPassagesString(d)
+		combinedPassages[i] = fmt.Sprintf("Document Reference Number [%d] %s", i, documentToPassagesString(d))
 	}
 	passages := strings.Join(combinedPassages, "\n\n")
 
@@ -73,7 +75,6 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-			fmt.Println("\nStream finished")
 			return nil
 		}
 
