@@ -11,15 +11,22 @@ type Passage struct {
 
 type Document struct {
 	// List of passages that compromise the document, ranked by topk relevance to query
-	Passages  []Passage `json:"passages"`
-	Title     string    `json:"title"`
-	Reference Reference `json:"reference"`
+	Passages     []Passage     `json:"passages"`
+	Title        string        `json:"title"`
+	Source       Source        `json:"source"`
+	WebReference *WebReference `json:"webReference"`
 }
 
-// Reference represents where the document came from, so it can be referenced or cited later
-type Reference struct {
-	Source Source `json:"source"`
-	URL    string `json:"url"`
+// WebReference represents where the document came from, so it can be referenced or cited later
+type WebReference struct {
+	Title         string `json:"title"`
+	Link          string `json:"link"`
+	DisplayedLink string `json:"displayedLink"`
+	Snippet       string `json:"snippet"`
+	Date          string `json:"date"`
+	Author        string `json:"author"`
+	Favicon       string `json:"favicon"`
+	Thumbnail     string `json:"thumbnail"`
 }
 
 // Source represents what type of corpus the document came from

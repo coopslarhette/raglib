@@ -20,15 +20,23 @@ func (sr SERPRetriever) Query(ctx context.Context, query string, maxTopK uint64)
 
 	docs := make([]document.Document, len(result.OrganicResults))
 	for i, r := range result.OrganicResults {
+		println(r.Link, r.DisplayedLink)
 		docs[i] = document.Document{
 			Passages: []document.Passage{
 				// TODO: maybe setup Query to accept a kind of parser as an argument to
 				//   handle different search results types
 				{Text: r.Snippet},
 			},
-			Reference: document.Reference{
-				Source: document.Web,
-				URL:    r.Link,
+			Source: document.Web,
+			WebReference: &document.WebReference{
+				Title:         r.Title,
+				Link:          r.Link,
+				DisplayedLink: r.DisplayedLink,
+				Snippet:       r.Snippet,
+				Date:          r.Date,
+				Favicon:       r.Favicon,
+				Author:        r.Author,
+				Thumbnail:     r.Thumbnail,
 			},
 			Title: r.Title,
 		}

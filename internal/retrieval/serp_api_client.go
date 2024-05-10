@@ -17,16 +17,26 @@ type SERPAPIClient struct {
 	client *http.Client
 }
 
+type OrganicResult struct {
+	Position         int    `json:"position"`
+	Title            string `json:"title"`
+	Link             string `json:"link"`
+	Snippet          string `json:"snippet"`
+	RedirectLink     string `json:"redirect_link"`
+	DisplayedLink    string `json:"displayed_link"`
+	Thumbnail        string `json:"thumbnail"`
+	Date             string `json:"date"`
+	Author           string `json:"author"`
+	CitedBy          string `json:"cited_by"`
+	ExtractedCitedBy int    `json:"extracted_cited_by"`
+	Favicon          string `json:"favicon"`
+}
+
 // SearchResult represents the JSON response from SerpApi's API response. The fields
 // here don't represent all the fields SerpApi returns, just the ones that might be
 // interesting to us currently.
 type SearchResult struct {
-	OrganicResults []struct {
-		Position int    `json:"position"`
-		Title    string `json:"title"`
-		Link     string `json:"link"`
-		Snippet  string `json:"snippet"`
-	} `json:"organic_results"`
+	OrganicResults []OrganicResult `json:"organic_results"`
 }
 
 func NewSerpApiClient(apiKey string, client *http.Client) *SERPAPIClient {
