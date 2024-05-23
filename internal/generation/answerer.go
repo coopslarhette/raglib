@@ -49,7 +49,7 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 
 	prompt := fmt.Sprintf(promptTemplate, passages, seedInput)
 	req := openai.ChatCompletionRequest{
-		Model:       openai.GPT4TurboPreview,
+		Model:       openai.GPT4o,
 		Temperature: 0,
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleUser, Content: prompt},
