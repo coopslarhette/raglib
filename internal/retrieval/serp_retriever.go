@@ -20,7 +20,6 @@ func (sr SERPRetriever) Query(ctx context.Context, query string, maxTopK uint64)
 
 	docs := make([]document.Document, len(result.OrganicResults))
 	for i, r := range result.OrganicResults {
-		println(r.Link, r.DisplayedLink)
 		docs[i] = document.Document{
 			Passages: []document.Passage{
 				// TODO: maybe setup Query to accept a kind of parser as an argument to
