@@ -17,7 +17,7 @@ var (
 
 Use them to answer the text below. Your answer could take many forms depending on the text below. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document), or it could be giving a detailed answer at a graduate level of explanation.
 
-A very important part of a good answer is that it is cited. For each statement, or component of your answer, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited>.".
+A very important part of a good answer is that it is cited. For each statement, or component of your answer, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
 
 <text_to_answer>%v</text_to_answer>
 `
