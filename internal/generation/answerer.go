@@ -19,7 +19,9 @@ Use them to answer the text below. Your answer could take many forms depending o
 
 A very important part of a good answer is that it is cited. For each statement, or component of your answer, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
 
-<text_to_answer>%v</text_to_answer>
+<user_input>%v</user_input>
+
+Finally, when it is appropriate you may insert Markdown formatted snippets into your answer. This may look like code blocks, bulleted or numbered lists, or other artifacts that could help to make the answer more digestible or illustrate the answer better.
 `
 )
 
@@ -54,7 +56,8 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleUser, Content: prompt},
 		},
-		Stream: shouldStream,
+		Stream:    shouldStream,
+		MaxTokens: 600,
 	}
 
 	if !shouldStream {
