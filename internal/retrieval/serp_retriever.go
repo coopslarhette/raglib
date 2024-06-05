@@ -12,8 +12,8 @@ type SERPRetriever struct {
 	client *SERPAPIClient
 }
 
-func (sr SERPRetriever) Query(ctx context.Context, query string, maxTopK uint64) ([]document.Document, error) {
-	result, err := sr.client.Query(ctx, query, maxTopK)
+func (sr SERPRetriever) Query(ctx context.Context, query string, topK uint64) ([]document.Document, error) {
+	result, err := sr.client.Query(ctx, query, topK)
 	if err != nil {
 		return nil, fmt.Errorf("error querying SERP API: %v", err)
 	}

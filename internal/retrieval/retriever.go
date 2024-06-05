@@ -6,5 +6,5 @@ import (
 )
 
 type Retriever interface {
-	Query(ctx context.Context, query string, maxTopK uint64) ([]document.Document, error)
+	Query(ctx context.Context, query string, topK uint64) ([]document.Document, error)
 }
