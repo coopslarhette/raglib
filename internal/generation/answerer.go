@@ -25,7 +25,7 @@ A very important part of a good answer is that it is cited. For any text that is
 
 Answer in plain text. Your plain text may contain Markdown-style code blocks, but only code blocks and no other Markdown syntax. This is a very strict requirement. Each newline will be rendered individually, we are not rendering the entire answer as Markdown, so any double newlines could look strange.
 
-Code blocks should NOT be cited directly, but any follow up context that is needed (and doesn't just repeat the code), can be'.
+Code blocks should NOT be cited directly, but any follow up context that is needed (and doesn't just repeat the code), can be.
 `
 )
 
