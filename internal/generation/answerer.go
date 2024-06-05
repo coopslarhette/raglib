@@ -11,17 +11,21 @@ import (
 )
 
 var (
-	promptTemplate = `Given the following document passages, which should each have a reference number,
+	promptTemplate = `Given the following document(s), which should each have a reference number,
 
 <passages>%v</passages>
 
-Use them to answer the text below. Your answer could take many forms depending on the text below. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document), or it could be giving a detailed answer at a graduate level of explanation.
+Use them to answer the text below. The answer could take different levels of brevity or detail, depending on the text below and what its asking, the level of understanding conveyed, etc. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document(s)), or it could be giving a detailed answer at a graduate level of explanation.
 
-A very important part of a good answer is that it is cited. For each statement, or component of your answer, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
+Generally, the answer should be concise and easily digestible, unless being more verbose is appropriate given the content in the document(s) and user inputted text. 
+
+A very important part of a good answer is that it is cited. For any text that is taken (in one way or another) from the source document above, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
 
 <user_input>%v</user_input>
 
-Finally, when it is appropriate you may insert Markdown formatted snippets into your answer. This may look like code blocks, bulleted or numbered lists, or other artifacts that could help to make the answer more digestible or illustrate the answer better.
+Answer in plain text. Your plain text may contain Markdown-style code blocks, but only code blocks and no other Markdown syntax. This is a very strict requirement. Each newline will be rendered individually, we are not rendering the entire answer as Markdown, so any double newlines could look strange.
+
+Code blocks should NOT be cited directly, but any follow up context that is needed (and doesn't just repeat the code), can be'.
 `
 )
 
