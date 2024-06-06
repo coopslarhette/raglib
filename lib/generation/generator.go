@@ -2,7 +2,7 @@ package generation
 
 import (
 	"context"
-	"raglib/internal/document"
+	"raglib/lib/document"
 )
 
 type Generator interface {

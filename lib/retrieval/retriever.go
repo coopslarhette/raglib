@@ -2,7 +2,7 @@ package retrieval
 
 import (
 	"context"
-	"raglib/internal/document"
+	"raglib/lib/document"
 )
 
 type Retriever interface {

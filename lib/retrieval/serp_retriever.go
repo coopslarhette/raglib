@@ -3,7 +3,7 @@ package retrieval
 import (
 	"context"
 	"fmt"
-	"raglib/internal/document"
+	"raglib/lib/document"
 )
 
 // SERPRetriever implements the Retriever interface. It retrieves documents by scraping the relevant Google

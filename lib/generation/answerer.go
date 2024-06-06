@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/sashabaranov/go-openai"
 	"io"
-	"raglib/internal/document"
+	"raglib/lib/document"
 	"strings"
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	qdrant "github.com/qdrant/go-client/qdrant"
 	"github.com/sashabaranov/go-openai"
-	"raglib/internal/document"
+	"raglib/lib/document"
 )
 
 // QdrantRetriever implements the Retriever interface
