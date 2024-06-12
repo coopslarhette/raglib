@@ -48,7 +48,7 @@ if err != nil {
 }
 
 for i, d := docs {
-	fmt.Printf("document at position %d is title: %v", i, d.Title)
+    fmt.Printf("document at position %d is title: %v", i, d.Title)
 }
 ```
 
