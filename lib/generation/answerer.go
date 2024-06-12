@@ -13,19 +13,42 @@ import (
 var (
 	promptTemplate = `Given the following document(s), which should each have a reference number,
 
-<passages>%v</passages>
+<passages>Document [0] <doc>The basic for loop has three components separated by semicolons: the init statement: executed before the first iteration; the condition expression: evaluated ...</doc>
 
-Use them to answer the text below. The answer could take different levels of brevity or detail, depending on the text below and what its asking, the level of understanding conveyed, etc. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document(s)), or it could be giving a detailed answer at a graduate level of explanation.
+Document [1] <doc>A range loop is used to iterate over the values in a slice, array or channel, the keys and values in a map, or the characters in a string.</doc>
 
-Generally, the answer should be concise and easily digestible, unless being more verbose is appropriate given the content in the document(s) and user inputted text. 
+Document [2] <doc>for is Go's only looping construct. Here are some basic types of for loops. package main. import "fmt". func main() {. The most basic type, with a single ...</doc>
 
-A very important part of a good answer is that it is cited. For any text that is taken (in one way or another) from the source document above, please cite it by referencing the provided reference number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
+Document [3] <doc>The range form of the for loop iterates over a slice or map. When ranging over a slice, two values are returned for each iteration. The first is the index ...</doc>
 
-<user_input>%v</user_input>
+Document [4] <doc>Golang for loop. In Golang, we use the for loop to repeat a block of code until the specified condition is met. Here's the syntax of the for loop in Golang.</doc></passages>
 
-Answer in plain text. Your plain text may contain Markdown-style code blocks, if the user input is coding related (ie it wouldn't be appropriate to include them as part of a general information query)', but only code blocks and no other Markdown syntax. This is a very strict requirement. Each newline will be rendered individually, we are not rendering the entire answer as Markdown, so any double newlines could look strange.
+Use them to respond to the text in the user_input tags below.
 
-If you include any code blocks, they should NOT be cited directly. Any other plain text statements supporting a code block should be cited, per usual.`
+<user_input>concisely answer this question: <question>golang for loop</question></user_input>
+
+The answer could take different levels of brevity or detail, depending on the text below and what its asking, the level of understanding conveyed, etc. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document(s)), or it could be giving a detailed answer at a graduate level of explanation.
+
+Generally, the answer should be concise and easily digestible, unless being more verbose is appropriate given the content in the document(s) and user inputted text. 
+
+A very important part of a good answer is that it is cited. For any text that is taken (in one way or another) from the source document above, please cite it by referencing the provided document number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
+
+Some ground rules:
+
+ALLOWED MARKDOWN SYNTAX:
+
+Code blocks:
+` + "```<language>\n<code-to-be-rendered>\n```\nor `<code>`" + `
+
+NOT ALLOWED MARKDOWN SYNTAX:
+- Bolding text via asterisks: **Lorem ipsum**
+- Any other Markdown syntax except what was listed under "ALLOWED MARKDOWN SYNTAX"
+
+Answer in plain text. Your plain text may contain code blocks formatted using Markdown syntax, if the user input is coding related (ie it wouldn't be appropriate to include them as part of a general information query)'. 
+
+If you include any code blocks, they should NOT be cited immediately. Any other plain text statements supporting a code block should be cited, per usual.
+
+Each newline will be rendered individually, we are not rendering the entire answer as Markdown, so any double newlines could look strange.`
 )
 
 func documentToPassagesString(doc document.Document) string {
@@ -48,13 +71,14 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	defer close(responseChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
-		combinedPassages[i] = fmt.Sprintf("Document Reference Number [%d] %s", i, documentToPassagesString(d))
+		combinedPassages[i] = fmt.Sprintf("Document [%d] <doc>%s</doc>", i, documentToPassagesString(d))
 	}
 	passages := strings.Join(combinedPassages, "\n\n")
 
 	prompt := fmt.Sprintf(promptTemplate, passages, seedInput)
+	fmt.Println(prompt)
 	req := openai.ChatCompletionRequest{
-		Model:       openai.GPT4o,
+		Model:       openai.GPT4Turbo,
 		Temperature: 0,
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleUser, Content: prompt},
