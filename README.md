@@ -1,6 +1,6 @@
 # raglib
 
-raglib is a Go library for retrieval-augmented generation, providing a set of tools and abstractions for building applications that combine information retrieval and language model-based text generation.
+raglib is a Go library for retrieval-augmented generation, providing a basic set of tools and abstractions for building applications that combine information retrieval and language model-based text generation. (Its currently a work in progress, thoughts and PRs welcome!)
 
 ## Features
 
