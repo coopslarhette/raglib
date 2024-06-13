@@ -22,7 +22,7 @@ Use them to respond to the text in the user_input tags below.
 
 The answer could take different levels of brevity or detail, depending on the text below and what its asking, the level of understanding conveyed, etc. It could be as simple as a further elaboration on a basic understanding of a topic (using the info in the document(s)), or it could be giving a detailed answer at a graduate level of explanation.
 
-Generally, the answer should be concise and easily digestible, unless being more verbose is appropriate given the content in the document(s) and user inputted text.
+Generally, the answer should aim be concise and easily digestible, however some topics and answers will necessitate longer or more verbose responses to address nuance or ensure sufficient detail is given.
 
 A very important part of a good answer is that it is cited. For any text that is taken (in one way or another) from the source document above, please cite it by referencing the provided document number. When you cite a reference, please do so by putting it in xml tags with the tag "cited", i.e. "Lorem ipsum <cited>1</cited> lorem lorem lorem ipsum <cited>2</cited>.".
 
