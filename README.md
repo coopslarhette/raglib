@@ -13,7 +13,7 @@ raglib is a Go library for retrieval-augmented generation, providing a set of to
 To use raglib in your Go project, run:
 
 ```bash
-go get github.com/yourusername/raglib
+go get github.com/coopslarhette/raglib
 ```
 
 ## Usage
