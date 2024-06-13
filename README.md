@@ -8,6 +8,10 @@ raglib is a Go library for retrieval-augmented generation, providing a basic set
 - Generate text based on the retrieved documents and user input
 - Customize and extend the library components to fit specific use cases
 
+### Examples
+
+There's examples of it being used in a HTTP server contained in _./api_, that is then consumed by a NextJS + TypeScript web UI in _./web-client_ 
+
 ## Installation
 
 To use raglib in your Go project, run:
