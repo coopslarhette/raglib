@@ -23,8 +23,13 @@ go get github.com/yourusername/raglib
 raglib provides the `Retriever` interface for retrieving relevant documents based on a given query.
 
 ```go
+import (
+    "context"
+    "raglib/lib/document"
+)
+
 type Retriever interface {
-	Query(ctx context.Context, query string, topK uint64) ([]document.Document, error)
+    Query(ctx context.Context, query string, topK uint64) ([]document.Document, error)
 }
 ```
 
@@ -54,7 +59,20 @@ for i, d := docs {
 
 ### Generating Text
 
-raglib provides the `Answerer` struct for generating text based on the retrieved documents and user input. The `Answerer` currently uses the OpenAI API for text generation. A facade that allows various model providers, or local LLMs to be used is forthcoming. 
+raglib also provides the Generator interface for retrieving relevant documents based on a given query.:
+
+```go
+import (
+	"context"
+	"raglib/lib/document"
+)
+
+type Generator interface {
+    Generate(ctx context.Context, documents []document.Document, responseChan chan<- string) error
+}
+```
+
+There is one included implementation of the `Generator` interface: the `Answerer` struct for answering input text based on the retrieved documents and user input. The `Answerer` currently uses the OpenAI API for text generation. A facade that allows various model providers, or local LLMs to be used is forthcoming. 
 
 Here's an example of how to use the `Answerer`:
 
@@ -91,4 +109,4 @@ The `document` package defines the `Document` struct, which represents a documen
 
 ## Contributing
 
-Contributions to raglib are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request on the [GitHub repository](https://github.com/yourusername/raglib).¬
+Contributions to raglib are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request on the [GitHub repository](https://github.com/yourusername/raglib).
