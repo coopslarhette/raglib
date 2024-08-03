@@ -22,7 +22,7 @@ type WebReference struct {
 	Title         string `json:"title"`
 	Link          string `json:"link"`
 	DisplayedLink string `json:"displayedLink"`
-	Snippet       string `json:"snippet"`
+	Blurb         string `json:"blurb"` // Blurb is intended to be a short summary, snippet, or preview of the full text
 	Date          string `json:"date"`
 	Author        string `json:"author"`
 	Favicon       string `json:"favicon"`
