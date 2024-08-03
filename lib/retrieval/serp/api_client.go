@@ -1,4 +1,4 @@
-package retrieval
+package serp
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"strconv"
 )
 
-// SERPAPIClient is the HTTP client for querying SerpApi API endpoints, mainly the
+// Client is the HTTP client for querying SerpApi API endpoints, mainly the
 // Google Search endpoint.
-type SERPAPIClient struct {
+type Client struct {
 	apiKey string
 	client *http.Client
 }
@@ -39,14 +39,14 @@ type SearchResult struct {
 	OrganicResults []OrganicResult `json:"organic_results"`
 }
 
-func NewSerpApiClient(apiKey string, client *http.Client) *SERPAPIClient {
-	return &SERPAPIClient{
+func NewClient(apiKey string, client *http.Client) *Client {
+	return &Client{
 		apiKey: apiKey,
 		client: client,
 	}
 }
 
-func (c *SERPAPIClient) Query(ctx context.Context, query string, topK uint64) (*SearchResult, error) {
+func (c *Client) Query(ctx context.Context, query string, topK int) (*SearchResult, error) {
 	apiURL, err := c.makeURL(query, topK)
 	if err != nil {
 		return nil, fmt.Errorf("error constructing URL for SERP API request: %v", err)
@@ -76,7 +76,7 @@ func (c *SERPAPIClient) Query(ctx context.Context, query string, topK uint64) (*
 	return &result, nil
 }
 
-func (c *SERPAPIClient) makeURL(query string, topK uint64) (*url.URL, error) {
+func (c *Client) makeURL(query string, topK int) (*url.URL, error) {
 	apiUrl, err := url.Parse("https://serpapi.com/search")
 	if err != nil {
 		return nil, fmt.Errorf("error parsing SERP API url: %v", err)
@@ -87,7 +87,7 @@ func (c *SERPAPIClient) makeURL(query string, topK uint64) (*url.URL, error) {
 	params.Set("q", query)
 	params.Set("api_key", c.apiKey)
 	params.Set("engine", "google")
-	params.Set("num", strconv.FormatUint(topK, 10))
+	params.Set("num", strconv.Itoa(topK))
 	apiUrl.RawQuery = params.Encode()
 
 	return apiUrl, nil

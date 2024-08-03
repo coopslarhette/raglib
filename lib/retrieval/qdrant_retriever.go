@@ -29,16 +29,19 @@ func (qr QdrantRetriever) toQueryEmbedding(ctx context.Context, query string) ([
 	return resp.Data[0].Embedding, nil
 }
 
-func (qr QdrantRetriever) Query(ctx context.Context, query string, maxTopK uint64) ([]document.Document, error) {
+func (qr QdrantRetriever) Query(ctx context.Context, query string, maxTopK int) ([]document.Document, error) {
 	qe, err := qr.toQueryEmbedding(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("error creating query emedding: %v", err)
 	}
 
+	if maxTopK < 0 {
+		return nil, fmt.Errorf("maxTopK cannot be negative")
+	}
 	unfilteredSearchResult, err := qr.pointsClient.Search(ctx, &qdrant.SearchPoints{
 		CollectionName: qr.collectionName,
 		Vector:         qe,
-		Limit:          maxTopK,
+		Limit:          uint64(maxTopK),
 		WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
 	})
 	if err != nil {
