@@ -3,3 +3,4 @@ qdrant_storage
 .idea
 /web-client/.next/
 app
+raglib
