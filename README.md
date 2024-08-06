@@ -49,7 +49,7 @@ client := retrieval.NewSERPAPIClient("your_api_key")
 retriever := retrieval.NewSERPRetriever(client)
 
 query := "your search query"
-topK := uint64(10)
+topK := 10
 
 docs, err := retriever.Query(context.Background(), query, topK)
 if err != nil {
