@@ -40,22 +40,15 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorMalformedRequest(errors.New("query parameter, 'q', is required")))
 		return
 	}
-
-	var webRetriever retrieval.Retriever
 	// TODO: use google ranking and document content from Exa
-	if true {
-		webRetriever = retrieval.NewExaRetriever(s.exaAPIClient)
-	} else {
-		webRetriever = retrieval.NewSERPRetriever(s.serpAPIClient)
-	}
 
 	personalCollectionName := "text_collection"
-	var retrieversByCorpus = map[string]retrieval.Retriever{
-		"personal": retrieval.NewQdrantRetriever(s.qdrantPointsClient, s.openAIClient, personalCollectionName),
-		"web":      webRetriever,
+	var availableRetrievers = map[string][]retrieval.Retriever{
+		"personal": {retrieval.NewQdrantRetriever(s.qdrantPointsClient, s.openAIClient, personalCollectionName)},
+		"web":      {retrieval.NewExaRetriever(s.exaAPIClient), retrieval.NewSERPRetriever(s.serpAPIClient)},
 	}
 
-	retrievers, errRenderer := corporaToRetrievers(corpora, retrieversByCorpus)
+	retrievers, errRenderer := doRetrieverSelection(corpora, availableRetrievers)
 	if errRenderer != nil {
 		render.Render(w, r, errRenderer)
 		return
@@ -112,7 +105,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func corporaToRetrievers(corporaSelection []string, retrieversByCorpus map[string]retrieval.Retriever) ([]retrieval.Retriever, render.Renderer) {
+func doRetrieverSelection(corporaSelection []string, retrieversByCorpus map[string][]retrieval.Retriever) ([]retrieval.Retriever, render.Renderer) {
 	retrievers := make([]retrieval.Retriever, len(corporaSelection))
 	for i, c := range corporaSelection {
 		retriever, ok := retrieversByCorpus[c]

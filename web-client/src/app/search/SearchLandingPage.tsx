@@ -33,7 +33,6 @@ type AnswerChunk = BaseChunk & (TextChunk | CitationChunk | CodeBlockChunk)
 const APIURL = process.env.NEXT_PUBLIC_API_URL
 
 function toURL(query: string) {
-    console.log(APIURL)
     return `${APIURL}/search?q=${encodeURIComponent(query)}&corpus=web`
 }
 
@@ -44,7 +43,8 @@ export default function SearchLandingPage() {
     const [hoveredCitationIndex, setHoveredCitationIndex] = useState<
         null | number
     >(null)
-    const [isSearchResponseLoading, setIsSearchResponseLoading] = useState(false)
+    const [isSearchResponseLoading, setIsSearchResponseLoading] =
+        useState(false)
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(event.target.value)
@@ -144,7 +144,7 @@ export default function SearchLandingPage() {
                     onKeyDown={handleKeyPress}
                     className={styles.searchInput}
                 />
-                <Button onClick={handleSearch} className={styles.searchButton}>
+                <Button onClick={handleSearch} disabled={query.length === 0} className={styles.searchButton}>
                     Search
                 </Button>
             </div>
