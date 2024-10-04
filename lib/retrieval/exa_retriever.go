@@ -24,8 +24,6 @@ func (er ExaRetriever) Query(ctx context.Context, query string, topK int) ([]doc
 		UseAutoprompt: true,
 	}
 
-	fmt.Printf("%+v", request)
-
 	result, err := er.client.Search(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("error querying Exa API: %v", err)
