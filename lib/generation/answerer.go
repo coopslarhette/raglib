@@ -59,8 +59,8 @@ type Answerer struct {
 
 // Generate implements the Generator interface. It generates an answer to some text grounded in the given documents.
 // TODO Generators as a concept are feeling a light silly/like they haven't hit their mark ye
-func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []document.Document, responseChan chan<- string, shouldStream bool) error {
-	defer close(responseChan)
+func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []document.Document, rawChunkChan chan<- string, shouldStream bool) error {
+	defer close(rawChunkChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
 		combinedPassages[i] = fmt.Sprintf("Document [%d] <doc>%s</doc>", i, documentToPassagesString(d))
@@ -87,7 +87,7 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 		if err != nil {
 			return fmt.Errorf("error making OpenAI API request: %v", err)
 		}
-		responseChan <- resp.Choices[0].Message.Content
+		rawChunkChan <- resp.Choices[0].Message.Content
 		return nil
 	}
 
@@ -107,7 +107,7 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 			return fmt.Errorf("error while streaming response: %v", err)
 		}
 
-		responseChan <- response.Choices[0].Delta.Content
+		rawChunkChan <- response.Choices[0].Delta.Content
 	}
 }
 
