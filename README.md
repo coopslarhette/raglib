@@ -109,4 +109,4 @@ The `document` package defines the `Document` struct, which represents a documen
 
 ## Contributing
 
-Contributions to raglib are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request on the [GitHub repository](https://github.com/yourusername/raglib).
+Contributions to raglib are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request.
