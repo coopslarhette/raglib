@@ -72,7 +72,7 @@ import (
 )
 
 type Generator interface {
-    Generate(ctx context.Context, documents []document.Document, responseChan chan<- string) error
+    Generate(ctx context.Context, documents []document.Document, rawChunkChan chan<- string) error
 }
 ```
 
@@ -87,17 +87,13 @@ answerer := generation.NewAnswerer(openaiClient)
 seedInput := "user input for text generation"
 documents := // Retrieved documents
 
-responseChan := make(chan string)
+rawChunkChan := make(chan string)
 shouldStream := true
 
-go func() {
-    if err := answerer.Generate(ctx, prompt, documents, responseChan, shouldStream); err != nil {
-        // Handle error    
-    }
-}()
+go answerer.Generate(ctx, prompt, documents, rawChunkChan, shouldStream)
 
-// Consume the generated text from the responseChan
-for response := range responseChan {
+// Consume the stream of generated text from the model provider (OpenAI in this case)
+for response := range rawChunkChan {
     fmt.Print(response)
 }
 ```
