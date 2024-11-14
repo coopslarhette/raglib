@@ -2,11 +2,9 @@ package generation
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/sashabaranov/go-openai"
-	"io"
 	"raglib/lib/document"
+	"raglib/lib/modelproviders"
 	"strings"
 )
 
@@ -53,12 +51,10 @@ func documentToPassagesString(doc document.Document) string {
 
 // Answerer implements the Generator interface.
 type Answerer struct {
-	// TODO abstraction here instead to allow different model providers
-	openaiClient *openai.Client
+	modelProvider *modelproviders.Facade
 }
 
 // Generate implements the Generator interface. It generates an answer to some text grounded in the given documents.
-// TODO Generators as a concept are feeling a light silly/like they haven't hit their mark ye
 func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []document.Document, rawChunkChan chan<- string, shouldStream bool) error {
 	defer close(rawChunkChan)
 	combinedPassages := make([]string, len(documents))
@@ -68,49 +64,17 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	passages := strings.Join(combinedPassages, "\n\n")
 
 	prompt := fmt.Sprintf(promptTemplate, passages, seedInput)
-	req := openai.ChatCompletionRequest{
-		Model: "llama3-70b-8192",
-		// When you specify a temperature field of 0 in Go OpenAI, the omitempty tag causes that field
-		// to be removed from the request. Consequently, the OpenAI API applies the default value of 1.
-		// We avoid this incorrect behavior with math.SmallestNonzeroFloat32, which mimics setting temp
-		// to 0
-		Temperature: 0.001,
-		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleUser, Content: prompt},
-		},
-		Stream:    shouldStream,
-		MaxTokens: 600,
+	req := modelproviders.GenerateRequest{
+		Provider:     modelproviders.AnthropicProvider,
+		Model:        "claude-3-5-haiku-20241022",
+		Prompt:       prompt,
+		ShouldStream: shouldStream,
+		MaxTokens:    600,
 	}
 
-	if !shouldStream {
-		resp, err := tg.openaiClient.CreateChatCompletion(ctx, req)
-		if err != nil {
-			return fmt.Errorf("error making OpenAI API request: %v", err)
-		}
-		rawChunkChan <- resp.Choices[0].Message.Content
-		return nil
-	}
-
-	stream, err := tg.openaiClient.CreateChatCompletionStream(ctx, req)
-	if err != nil {
-		return fmt.Errorf("error making OpenAI API request: %v", err)
-	}
-	defer stream.Close()
-
-	for {
-		response, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
-
-		if err != nil {
-			return fmt.Errorf("error while streaming response: %v", err)
-		}
-
-		rawChunkChan <- response.Choices[0].Delta.Content
-	}
+	return tg.modelProvider.Generate(ctx, req, rawChunkChan)
 }
 
-func NewAnswerer(openAIClient *openai.Client) Answerer {
-	return Answerer{openAIClient}
+func NewAnswerer(modelProvider *modelproviders.Facade) Answerer {
+	return Answerer{modelProvider}
 }
