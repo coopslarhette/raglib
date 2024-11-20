@@ -34,8 +34,8 @@ Instructions for formulating your response:
    - Use an informative and balanced tone.
 
 2. Citation Format:
-   - For any information taken from the source documents, wrap citations in XML tags.
-   - Format: <cited>X</cited>, where X is a single document number.
+   - For any information taken from the reference documents, it is important to reference the source material via citations.
+   - Format: <cited>X</cited>, where X is the document number (originally in <reference_documents>) of the supporting source material.
    - Place citations directly after the statement they're supporting.
    - If citing multiple documents at a single citation location, use comma's to separate the numbers 
    - Example: "The study found a significant increase in productivity <cited>1</cited>. Also, major productivity gains were had from better tooling <cited>2,3</cited>."
@@ -85,7 +85,8 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	defer close(rawChunkChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
-		combinedPassages[i] = fmt.Sprintf("Document [%d] <doc>%s</doc>", i, documentToPassagesString(d))
+		// The model(s) seem to work with higher accuracy when not using 0-indexes references
+		combinedPassages[i] = fmt.Sprintf("Document [%d] <docucment>%s</docucment>", i+1, documentToPassagesString(d))
 	}
 	passages := strings.Join(combinedPassages, "\n\n")
 
