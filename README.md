@@ -41,7 +41,7 @@ The library includes two implementations of this interface:
 
 1. `SERPRetriever`: Retrieves document snippets/web ranking by scraping Google Search results pages for a given query using the SERP API.
 2. `ExaRetriever`: Retrieves full text of relevant web pages from https://exa.ai/, based on a givem query (or URL)
-3. `QdrantRetriever`: Retrieves documents from a collections in a [Qdrant](https://qdrant.tech/) vector database.
+3. `QdrantRetriever`: Retrieves relevant documents from a collections in a [Qdrant](https://qdrant.tech/) vector database, based on a given query.
 
 An example of how to use the `SERPRetriever`:
 
