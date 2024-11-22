@@ -40,7 +40,7 @@ type Retriever interface {
 The library includes two implementations of this interface:
 
 1. `SERPRetriever`: Retrieves document snippets/web ranking by scraping Google Search results pages for a given query using the SERP API.
-2. 'ExaRetriever': Retrieves full text of relevant web pages from https://exa.ai/, based on a givem query (or URL)
+2. `ExaRetriever`: Retrieves full text of relevant web pages from https://exa.ai/, based on a givem query (or URL)
 3. `QdrantRetriever`: Retrieves documents from a collections in a [Qdrant](https://qdrant.tech/) vector database.
 
 An example of how to use the `SERPRetriever`:
