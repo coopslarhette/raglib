@@ -1,4 +1,4 @@
-package retrieval
+package qdrant
 
 import (
 	"context"
@@ -8,14 +8,14 @@ import (
 	"raglib/lib/document"
 )
 
-// QdrantRetriever implements the Retriever interface
-type QdrantRetriever struct {
+// Retriever implements the retrieval.Retriever interface. It retrieves non-web documents via query embeddings.
+type Retriever struct {
 	pointsClient   qdrant.PointsClient
 	openaiClient   *openai.Client
 	collectionName string
 }
 
-func (qr QdrantRetriever) toQueryEmbedding(ctx context.Context, query string) ([]float32, error) {
+func (qr Retriever) toQueryEmbedding(ctx context.Context, query string) ([]float32, error) {
 	req := openai.EmbeddingRequest{
 		Input: []string{query},
 		Model: openai.AdaEmbeddingV2,
@@ -29,7 +29,7 @@ func (qr QdrantRetriever) toQueryEmbedding(ctx context.Context, query string) ([
 	return resp.Data[0].Embedding, nil
 }
 
-func (qr QdrantRetriever) Query(ctx context.Context, query string, maxTopK int) ([]document.Document, error) {
+func (qr Retriever) Query(ctx context.Context, query string, maxTopK int) ([]document.Document, error) {
 	qe, err := qr.toQueryEmbedding(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("error creating query emedding: %v", err)
@@ -61,6 +61,6 @@ func (qr QdrantRetriever) Query(ctx context.Context, query string, maxTopK int) 
 	return docs, nil
 }
 
-func NewQdrantRetriever(pointsClient qdrant.PointsClient, openaiClient *openai.Client, collectionName string) QdrantRetriever {
-	return QdrantRetriever{pointsClient, openaiClient, collectionName}
+func NewRetriever(pointsClient qdrant.PointsClient, openaiClient *openai.Client, collectionName string) Retriever {
+	return Retriever{pointsClient, openaiClient, collectionName}
 }

@@ -1,19 +1,18 @@
-package retrieval
+package serp
 
 import (
 	"context"
 	"fmt"
 	"raglib/lib/document"
-	"raglib/lib/retrieval/serp"
 )
 
-// SERPRetriever implements the Retriever interface. It retrieves documents by scraping the relevant Google
+// Retriever implements the Retriever interface for the SERP API. SERP obtains documents and web ranking by scraping the relevant Google
 // Search results page for a given query.
-type SERPRetriever struct {
-	client *serp.Client
+type Retriever struct {
+	client *Client
 }
 
-func (sr SERPRetriever) Query(ctx context.Context, query string, topK int) ([]document.Document, error) {
+func (sr Retriever) Query(ctx context.Context, query string, topK int) ([]document.Document, error) {
 	result, err := sr.client.Query(ctx, query, topK)
 	if err != nil {
 		return nil, fmt.Errorf("error querying SERP API: %v", err)
@@ -45,6 +44,6 @@ func (sr SERPRetriever) Query(ctx context.Context, query string, topK int) ([]do
 	return docs, nil
 }
 
-func NewSERPRetriever(client *serp.Client) SERPRetriever {
-	return SERPRetriever{client}
+func NewRetriever(client *Client) Retriever {
+	return Retriever{client}
 }

@@ -1,23 +1,22 @@
-package retrieval
+package exa
 
 import (
 	"context"
 	"fmt"
 	"raglib/lib/document"
-	"raglib/lib/retrieval/exa"
 )
 
-// ExaRetriever implements the Retriever interface. It retrieves documents using the Exa Search API endpoint.
-type ExaRetriever struct {
-	client *exa.Client
+// Retriever implements the retrieval.Retriever interface for the Exa search service. It retrieves web documents using their API endpoint.
+type Retriever struct {
+	client *Client
 }
 
-func (er ExaRetriever) Query(ctx context.Context, query string, topK int) ([]document.Document, error) {
-	request := exa.SearchRequest{
+func (er Retriever) Query(ctx context.Context, query string, topK int) ([]document.Document, error) {
+	request := SearchRequest{
 		Query:      query,
 		NumResults: topK,
-		Contents: &exa.Contents{
-			Text: &exa.TextContent{
+		Contents: &Contents{
+			Text: &TextContent{
 				MaxCharacters: 1000,
 			},
 		},
@@ -57,6 +56,6 @@ func (er ExaRetriever) Query(ctx context.Context, query string, topK int) ([]doc
 	return docs, nil
 }
 
-func NewExaRetriever(client *exa.Client) ExaRetriever {
-	return ExaRetriever{client}
+func NewRetriever(client *Client) Retriever {
+	return Retriever{client}
 }
