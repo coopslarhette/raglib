@@ -39,8 +39,9 @@ type Retriever interface {
 
 The library includes two implementations of this interface:
 
-1. `SERPRetriever`: Retrieves documents by scraping Google Search results pages for a given query using the SERP API.
-2. `QdrantRetriever`: Retrieves documents from a Qdrant vector database using an `text-embedding-ada-002` for query embedding.
+1. `SERPRetriever`: Retrieves document snippets/web ranking by scraping Google Search results pages for a given query using the SERP API.
+2. `ExaRetriever`: Retrieves full text of relevant web pages from https://exa.ai/, based on a given query (or URL)
+3. `QdrantRetriever`: Retrieves relevant documents from a collections in a [Qdrant](https://qdrant.tech/) vector database, based on a given query.
 
 An example of how to use the `SERPRetriever`:
 
