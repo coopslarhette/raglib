@@ -62,6 +62,10 @@ pass
    - Do not use any Markdown formatting except for code blocks.
    - Do not use bolding or other text emphasis.
 
+7. HTML Character Entities
+   - You may see some HTML Character Entities in the source documents
+   - Do not copy these style of representation, instead rewrite them so a human can easily understand, ie "&lt;" should become "<"
+
 Your entire response will be visible to the user. Therefore, present your thoughts and final response in a cohesive, professional manner.
 
 Please begin.`

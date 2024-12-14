@@ -14,6 +14,7 @@ import (
 	"raglib/lib/retrieval/exa"
 	"raglib/lib/retrieval/qdrant"
 	"raglib/lib/retrieval/serp"
+	"sync"
 )
 
 type SearchResponse struct {
@@ -46,24 +47,35 @@ func validateAndExtractParams(r *http.Request) (query string, corpora []string, 
 }
 
 func (s *Server) determineRetrievers(corpora []string) ([]retrieval.Retriever, error) {
-	var webRetriever retrieval.Retriever
-	// TODO: use google ranking and document content from Exa
-	if true {
-		webRetriever = exa.NewRetriever(s.exaAPIClient)
-	} else {
-		webRetriever = serp.NewRetriever(s.serpAPIClient)
-	}
-
 	personalCollectionName := "text_collection"
-	var retrieversByCorpus = map[string]retrieval.Retriever{
-		"personal": qdrant.NewRetriever(s.qdrantPointsClient, s.modelProvider.OpenAIClient, personalCollectionName),
-		"web":      webRetriever,
+	var retrieversByCorpus = map[string][]retrieval.Retriever{
+		"personal": {
+			qdrant.NewRetriever(s.qdrantPointsClient, s.modelProvider.OpenAIClient, personalCollectionName),
+		},
+		"web": {
+			exa.NewRetriever(s.exaAPIClient),
+			serp.NewRetriever(s.serpAPIClient),
+		},
 	}
 
 	retrievers, err := corporaToRetrievers(corpora, retrieversByCorpus)
 	if err != nil {
 		return nil, err
 	}
+	return retrievers, nil
+}
+
+func corporaToRetrievers(corporaSelection []string, retrieversByCorpus map[string][]retrieval.Retriever) ([]retrieval.Retriever, error) {
+	var retrievers []retrieval.Retriever
+
+	for _, corpus := range corporaSelection {
+		corpusRetrievers, ok := retrieversByCorpus[corpus]
+		if !ok {
+			return nil, fmt.Errorf("corpus, %v, is invalid", corpus)
+		}
+		retrievers = append(retrievers, corpusRetrievers...)
+	}
+
 	return retrievers, nil
 }
 
@@ -86,6 +98,21 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	seen := map[string][]string{}
+	for _, d := range documents {
+		if _, ok := seen[d.WebReference.Link]; !ok {
+			seen[d.WebReference.Link] = []string{d.WebReference.APISource}
+		} else {
+			seen[d.WebReference.Link] = append(seen[d.WebReference.Link], d.WebReference.APISource)
+		}
+	}
+
+	for l, s := range seen {
+		if len(s) > 1 {
+			fmt.Printf("multiple sources for %s", l)
+		}
+	}
+
 	ctx := r.Context()
 	g, gctx := errgroup.WithContext(ctx)
 
@@ -95,9 +122,8 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	rawChunkChan := make(chan string, 1)
 	processedEventChan := make(chan sse.Event, 1)
 
-	prompt := fmt.Sprintf("<question>%s</question>", query)
 	g.Go(func() error {
-		return answerer.Generate(gctx, prompt, documents, rawChunkChan, shouldStream)
+		return answerer.Generate(gctx, query, documents, rawChunkChan, shouldStream)
 	})
 
 	if !shouldStream {
@@ -167,30 +193,29 @@ func (s *Server) writeEventsToStream(ctx context.Context, stream sse.Stream, pro
 	}
 }
 
-func corporaToRetrievers(corporaSelection []string, retrieversByCorpus map[string]retrieval.Retriever) ([]retrieval.Retriever, error) {
-	retrievers := make([]retrieval.Retriever, len(corporaSelection))
-	for i, c := range corporaSelection {
-		retriever, ok := retrieversByCorpus[c]
-		if !ok {
-			return nil, fmt.Errorf("corpus, %v, is invalid", c)
-		}
-		retrievers[i] = retriever
-	}
-	return retrievers, nil
-}
-
 func retrieveAllDocuments(ctx context.Context, q string, retrievers []retrieval.Retriever) ([]document.Document, error) {
-	documents := make(chan []document.Document, len(retrievers))
+	var (
+		wg           errgroup.Group
+		mu           sync.Mutex
+		docsBySource = make(map[string][]document.Document)
+	)
 
-	var wg errgroup.Group
 	for _, r := range retrievers {
+		r := r // capture loop variable
 		wg.Go(func() error {
 			docs, err := r.Query(ctx, q, 5)
 			if err != nil {
 				return err
 			}
 
-			documents <- docs
+			if len(docs) == 0 {
+				return nil
+			}
+
+			mu.Lock()
+			docsBySource[docs[0].WebReference.APISource] = docs
+			mu.Unlock()
+
 			return nil
 		})
 	}
@@ -198,12 +223,23 @@ func retrieveAllDocuments(ctx context.Context, q string, retrievers []retrieval.
 	if err := wg.Wait(); err != nil {
 		return nil, fmt.Errorf("error while retrieving documents: %v", err)
 	}
-	close(documents)
 
-	var allDocs []document.Document
-	for docs := range documents {
-		allDocs = append(allDocs, docs...)
+	fullTextDocsByURL := make(map[string]document.Document, len(docsBySource["exa"]))
+	for _, d := range docsBySource["exa"] {
+		fullTextDocsByURL[d.WebReference.Link] = d
 	}
 
-	return allDocs, nil
+	var ret []document.Document
+	// Use order of SERP results to rank the full text documents from
+	for _, d := range docsBySource["serp"] {
+		toAppend, ok := fullTextDocsByURL[d.WebReference.Link]
+		if !ok {
+			fmt.Printf("Exa document not present for SERP document with title: %s", d.Title)
+			continue
+		}
+
+		ret = append(ret, toAppend)
+	}
+
+	return ret, nil
 }

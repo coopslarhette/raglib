@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styles from './SourceCard.module.css'
 import {
     Card,
@@ -25,6 +25,11 @@ export function SourceCard({
         window.open(link, '_blank', 'noopener noreferrer')
     }
 
+    const domainName = useMemo(
+        () => displayedLink.replace(/.+\/\/|www.|\..+/g, ''),
+        [displayedLink]
+    )
+
     return (
         <Card className={styles.cardRoot}>
             <CardActionArea
@@ -33,6 +38,7 @@ export function SourceCard({
                     [styles.hoveredViaCitation]: isHoveredViaCitation,
                 })}
             >
+                <Typography>{domainName}</Typography>
                 {thumbnail && (
                     <CardMedia
                         component="img"

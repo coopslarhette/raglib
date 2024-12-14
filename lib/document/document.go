@@ -13,8 +13,8 @@ type Document struct {
 	// List of passages that compromise the document, ranked by topk relevance to query
 	Passages     []Passage     `json:"passages"`
 	Title        string        `json:"title"`
-	Source       Source        `json:"source"`
-	WebReference *WebReference `json:"webReference"`
+	Corpus       Corpus        `json:"corpus"`
+	WebReference *WebReference `json:"webReference"` // Not present when Corpus is Personal
 }
 
 // WebReference represents where the document came from, so it can be referenced or cited later
@@ -27,25 +27,26 @@ type WebReference struct {
 	Author        string `json:"author"`
 	Favicon       string `json:"favicon"`
 	Thumbnail     string `json:"thumbnail"`
+	APISource     string
 }
 
-// Source represents what type of corpus the document came from
-type Source int
+// Corpus represents where the document came from
+type Corpus int
 
 const (
-	Web Source = iota
+	Web Corpus = iota
 	Personal
 )
 
-func (s Source) String() string {
+func (s Corpus) String() string {
 	return [...]string{"web", "personal"}[s]
 }
 
-func (s Source) MarshalJSON() ([]byte, error) {
+func (s Corpus) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.String())
 }
 
-func (s *Source) UnmarshalJSON(data []byte) error {
+func (s *Corpus) UnmarshalJSON(data []byte) error {
 	var str string
 	err := json.Unmarshal(data, &str)
 	if err != nil {
