@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"raglib/lib/document"
+	"raglib/lib/retrieval/urls"
 )
 
 // Retriever implements the retrieval.Retriever interface for the Exa search service. It retrieves web documents using their API endpoint.
@@ -21,6 +22,7 @@ func (er Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 			},
 		},
 		UseAutoprompt: true,
+		Type:          "auto",
 	}
 
 	result, err := er.client.Search(ctx, request)
@@ -30,6 +32,11 @@ func (er Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 
 	docs := make([]document.Document, len(result.Results))
 	for i, r := range result.Results {
+		url, err := urls.Parse(r.URL)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing web page url: %v", err)
+		}
+
 		docs[i] = document.Document{
 			Passages: []document.Passage{
 				{Text: r.Text},
@@ -38,7 +45,7 @@ func (er Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 			WebReference: &document.WebReference{
 				Title:         r.Title,
 				Link:          r.URL,
-				DisplayedLink: r.URL, // Exa API doesn't provide a separate displayed link
+				DisplayedLink: url.FullDomain(),
 				Blurb:         r.Summary,
 				Date:          r.PublishedDate,
 				Author:        r.Author,
