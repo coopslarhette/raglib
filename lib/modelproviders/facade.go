@@ -8,7 +8,6 @@ import (
 	"github.com/anthropics/anthropic-sdk-go/option"
 	"github.com/sashabaranov/go-openai"
 	"io"
-	"strings"
 )
 
 // ModelProvider represents supported model providers
@@ -131,20 +130,15 @@ func (f *Facade) handleAnthropic(ctx context.Context, req GenerateRequest, rawCh
 		Messages:  anthropic.F(messages),
 	})
 
-	debugAcc := strings.Builder{}
 	for stream.Next() {
 		event := stream.Current()
 		switch delta := event.Delta.(type) {
 		case anthropic.ContentBlockDeltaEventDelta:
 			if delta.Text != "" {
 				rawChunkChan <- delta.Text
-				debugAcc.WriteString(delta.Text)
 			}
 		}
 	}
-
-	fmt.Println("hello")
-	fmt.Println(debugAcc.String())
 
 	if err := stream.Err(); err != nil {
 		return fmt.Errorf("error while streaming Anthropic response: %v", err)
