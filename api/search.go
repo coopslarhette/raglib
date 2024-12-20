@@ -203,7 +203,7 @@ func retrieveAllDocuments(ctx context.Context, q string, retrievers []retrieval.
 	for _, r := range retrievers {
 		r := r // capture loop variable
 		wg.Go(func() error {
-			docs, err := r.Query(ctx, q, 5)
+			docs, err := r.Query(ctx, q, 20)
 			if err != nil {
 				return err
 			}
@@ -224,21 +224,49 @@ func retrieveAllDocuments(ctx context.Context, q string, retrievers []retrieval.
 		return nil, fmt.Errorf("error while retrieving documents: %v", err)
 	}
 
-	fullTextDocsByURL := make(map[string]document.Document, len(docsBySource["exa"]))
-	for _, d := range docsBySource["exa"] {
-		fullTextDocsByURL[d.WebReference.Link] = d
+	exaDocs, ok := docsBySource["exa"]
+	if !ok {
+		return nil, fmt.Errorf("no Exa documents found")
 	}
 
-	var ret []document.Document
-	// Use order of SERP results to rank the full text documents from
-	for _, d := range docsBySource["serp"] {
-		toAppend, ok := fullTextDocsByURL[d.WebReference.Link]
-		if !ok {
-			fmt.Printf("Exa document not present for SERP document with title: %s", d.Title)
+	exaDocsByURL := make(map[string]document.Document, len(exaDocs))
+	for _, d := range exaDocs {
+		exaDocsByURL[d.WebReference.Link] = d
+	}
+
+	serpDocs, ok := docsBySource["serp"]
+	if !ok {
+		return nil, fmt.Errorf("no SERP documents found")
+	}
+
+	seen := make(map[string]struct{})
+
+	// Return 6 documents because based of some YOLO intuition should contain sufficient amount / highly relevant content
+	// but not swamp the model with text, also 6 docs looks nicest in the UI
+	const documentCountToReturn = 6
+	ret := make([]document.Document, 0, documentCountToReturn)
+
+	for _, fromSerp := range serpDocs {
+		if len(ret) >= documentCountToReturn {
+			break
+		}
+		fromExa, exists := exaDocsByURL[fromSerp.WebReference.Link]
+		if !exists {
 			continue
 		}
 
-		ret = append(ret, toAppend)
+		seen[fromSerp.WebReference.Link] = struct{}{}
+		ret = append(ret, fromExa)
+	}
+
+	slog.Info("SERP / Exa response stats", "Number SERP results Exa has coverage for", len(ret), "Num SERP retrieved", len(serpDocs), "Num Exa retrieved", len(exaDocs))
+
+	for i := 0; len(ret) < documentCountToReturn && i < len(exaDocs); i++ {
+		fromExa := exaDocs[i]
+		if _, exists := seen[fromExa.WebReference.Link]; exists {
+			continue
+		}
+		ret = append(ret, fromExa)
 	}
 
 	return ret, nil
