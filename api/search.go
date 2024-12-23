@@ -98,21 +98,6 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	seen := map[string][]string{}
-	for _, d := range documents {
-		if _, ok := seen[d.WebReference.Link]; !ok {
-			seen[d.WebReference.Link] = []string{d.WebReference.APISource}
-		} else {
-			seen[d.WebReference.Link] = append(seen[d.WebReference.Link], d.WebReference.APISource)
-		}
-	}
-
-	for l, s := range seen {
-		if len(s) > 1 {
-			fmt.Printf("multiple sources for %s", l)
-		}
-	}
-
 	ctx := r.Context()
 	g, gctx := errgroup.WithContext(ctx)
 
