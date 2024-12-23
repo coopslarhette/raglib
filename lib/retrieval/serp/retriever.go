@@ -26,7 +26,7 @@ func (sr Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 				//   handle different search results types
 				{Text: r.Snippet},
 			},
-			Source: document.Web,
+			Corpus: document.Web,
 			WebReference: &document.WebReference{
 				Title:         r.Title,
 				Link:          r.Link,
@@ -36,6 +36,7 @@ func (sr Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 				Favicon:       r.Favicon,
 				Author:        r.Author,
 				Thumbnail:     r.Thumbnail,
+				APISource:     "serp",
 			},
 			Title: r.Title,
 		}

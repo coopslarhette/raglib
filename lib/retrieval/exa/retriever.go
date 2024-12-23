@@ -41,7 +41,7 @@ func (er Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 			Passages: []document.Passage{
 				{Text: r.Text},
 			},
-			Source: document.Web,
+			Corpus: document.Web,
 			WebReference: &document.WebReference{
 				Title:         r.Title,
 				Link:          r.URL,
@@ -49,6 +49,7 @@ func (er Retriever) Query(ctx context.Context, query string, topK int) ([]docume
 				Blurb:         r.Summary,
 				Date:          r.PublishedDate,
 				Author:        r.Author,
+				APISource:     "exa",
 			},
 			Title: r.Title,
 		}
