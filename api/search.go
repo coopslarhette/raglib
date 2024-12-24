@@ -46,6 +46,11 @@ func validateAndExtractParams(r *http.Request) (query string, corpora []string, 
 	return query, corpora, nil
 }
 
+func doEnrichment(ctx context.Context, documents []document.Document) ([]document.Document, error) {
+	//	Add exa text to top 3 google results, use top 3 exa results for next 3 results?
+	return documents, nil
+}
+
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	query, corpora, err := validateAndExtractParams(r)
 	if err != nil {
@@ -60,6 +65,8 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, InternalServerError(err.Error()))
 		return
 	}
+
+	documents, err = doEnrichment(ctx, documents)
 
 	g, gctx := errgroup.WithContext(ctx)
 
