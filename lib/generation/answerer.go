@@ -53,11 +53,12 @@ Instructions for formulating your response:
    - Do not cite code blocks directly, but cite any supporting statements related to the code block.
    - Label code blocks with the appropriate language name.
    - Example:
-     ` + "```" + `python
-def example_function():
-pass
+` + "```" + `python
+	def example_function():
+	pass
 ` + "```" +
-		`6. HTML Character Entities
+		`
+6. HTML Character Entities
    - You may see some HTML Character Entities in the source documents
    - Do not copy these style of representation, instead rewrite them so a human can easily understand, ie "&lt;" should become "<"
 
@@ -87,6 +88,9 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 		combinedPassages[i] = fmt.Sprintf("Document [%d] <docucment>%s</docucment>", i, documentToPassagesString(d))
 	}
 	passages := strings.Join(combinedPassages, "\n\n")
+
+	// Exa sometimes returns corrupted text that is not valid JSON, thus we need to do this
+	passages = MakeJSONSafe(passages)
 
 	prompt := fmt.Sprintf(promptTemplate, passages, seedInput)
 	req := modelproviders.GenerateRequest{
