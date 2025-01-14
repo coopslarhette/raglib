@@ -11,7 +11,7 @@ import (
 var (
 	promptTemplate = `You are an advanced AI assistant designed to provide accurate, well-cited responses to user queries based on given reference documents. Your task is to ingest and absorb the provided documents, and use them to answer the user's query in a clear, concise, and informative manner.
 
-Here are the reference documents you should use to formulate your response:
+Here are the reference documents you should use to formulate your response. Note the documents are 0-indexed, please reference them in this way.:
 
 <reference_documents>
 %s
@@ -50,19 +50,15 @@ Instructions for formulating your response:
 
 5. Code Blocks:
    - Include code blocks when relevant to coding-related queries.
+   - Do not cite code blocks directly, but cite any supporting statements related to the code block.
    - Label code blocks with the appropriate language name.
    - Example:
-     ` + "```" + `python
-def example_function():
-pass
+` + "```" + `python
+	def example_function():
+	pass
 ` + "```" +
-		`- Do not cite code blocks directly, but cite any supporting statements related to the code block.
-
-6. Formatting:
-   - Do not use any Markdown formatting except for code blocks.
-   - Do not use bolding or other text emphasis.
-
-7. HTML Character Entities
+		`
+6. HTML Character Entities
    - You may see some HTML Character Entities in the source documents
    - Do not copy these style of representation, instead rewrite them so a human can easily understand, ie "&lt;" should become "<"
 
@@ -89,10 +85,12 @@ func (tg Answerer) Generate(ctx context.Context, seedInput string, documents []d
 	defer close(rawChunkChan)
 	combinedPassages := make([]string, len(documents))
 	for i, d := range documents {
-		// The model(s) seem to work with higher accuracy when not using 0-indexes references
-		combinedPassages[i] = fmt.Sprintf("Document [%d] <docucment>%s</docucment>", i+1, documentToPassagesString(d))
+		combinedPassages[i] = fmt.Sprintf("Document [%d] <docucment>%s</docucment>", i, documentToPassagesString(d))
 	}
 	passages := strings.Join(combinedPassages, "\n\n")
+
+	// Exa sometimes returns corrupted text that is not valid JSON, thus we need to do this
+	passages = MakeJSONSafe(passages)
 
 	prompt := fmt.Sprintf(promptTemplate, passages, seedInput)
 	req := modelproviders.GenerateRequest{
