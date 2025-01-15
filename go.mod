@@ -1,4 +1,4 @@
-module raglib
+module github.com/coopslarhette/raglib
 
 go 1.21
 
