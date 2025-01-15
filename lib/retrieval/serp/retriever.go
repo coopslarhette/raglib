@@ -3,7 +3,7 @@ package serp
 import (
 	"context"
 	"fmt"
-	"raglib/lib/document"
+	"github.com/coopslarhette/raglib/lib/document"
 )
 
 // Retriever implements the Retriever interface for the SERP API. SERP obtains documents and web ranking by scraping the relevant Google

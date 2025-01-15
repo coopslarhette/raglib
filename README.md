@@ -29,7 +29,7 @@ raglib provides the `Retriever` interface for retrieving relevant documents base
 ```go
 import (
     "context"
-    "raglib/lib/document"
+    "github.com/coopslarhette/raglib/lib/document"
 )
 
 type Retriever interface {
@@ -69,7 +69,7 @@ raglib also provides the Generator interface for retrieving relevant documents b
 ```go
 import (
 	"context"
-	"raglib/lib/document"
+	"github.com/coopslarhette/raglib/lib/document"
 )
 
 type Generator interface {

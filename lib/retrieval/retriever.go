@@ -2,7 +2,7 @@ package retrieval
 
 import (
 	"context"
-	"raglib/lib/document"
+	"github.com/coopslarhette/raglib/lib/document"
 )
 
 type Retriever interface {

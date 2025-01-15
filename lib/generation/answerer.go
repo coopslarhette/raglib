@@ -3,8 +3,8 @@ package generation
 import (
 	"context"
 	"fmt"
-	"raglib/lib/document"
-	"raglib/lib/modelproviders"
+	"github.com/coopslarhette/raglib/lib/document"
+	"github.com/coopslarhette/raglib/lib/modelproviders"
 	"strings"
 )
 

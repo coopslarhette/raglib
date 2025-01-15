@@ -3,9 +3,9 @@ package qdrant
 import (
 	"context"
 	"fmt"
+	"github.com/coopslarhette/raglib/lib/document"
 	qdrant "github.com/qdrant/go-client/qdrant"
 	"github.com/sashabaranov/go-openai"
-	"raglib/lib/document"
 )
 
 // Retriever implements the retrieval.Retriever interface. It retrieves non-web documents via query embeddings.

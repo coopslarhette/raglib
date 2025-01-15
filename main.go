@@ -4,12 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/coopslarhette/raglib/api"
 	"github.com/joho/godotenv"
 	qdrant "github.com/qdrant/go-client/qdrant"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
-	"raglib/api"
 )
 
 var (

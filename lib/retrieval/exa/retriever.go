@@ -3,8 +3,8 @@ package exa
 import (
 	"context"
 	"fmt"
-	"raglib/lib/document"
-	"raglib/lib/retrieval/urls"
+	"github.com/coopslarhette/raglib/lib/document"
+	"github.com/coopslarhette/raglib/lib/retrieval/urls"
 )
 
 // Retriever implements the retrieval.Retriever interface for the Exa search service. It retrieves web documents using their API endpoint.
