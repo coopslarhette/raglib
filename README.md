@@ -10,7 +10,7 @@ raglib is a Go library for retrieval-augmented generation, providing a basic set
 
 ### Examples
 
-There's examples of it being used in a REST API contained in _./api_, that is then consumed by a NextJS + TypeScript web UI in _./web-client_ 
+See https://github.com/coopslarhette/raglib-demo/ for an example of it being used to build a generative search appplication.
 
 ## Installation
 
